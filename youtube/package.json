@@ -1,0 +1,14 @@
+{
+  "name": "youtube-tools",
+  "version": "1.0.0",
+  "description": "YouTube video tools for clipping and uploading",
+  "type": "module",
+  "scripts": {
+    "clip-and-short": "node scripts/clip-and-short.js",
+    "upload": "node scripts/upload.js"
+  },
+  "dependencies": {
+    "googleapis": "^134.0.0",
+    "open": "^9.1.0"
+  }
+}
