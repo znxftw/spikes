@@ -5,7 +5,10 @@ import url from 'url';
 import open from 'open';
 import path from 'path';
 
-const SCOPES = ['https://www.googleapis.com/auth/youtube.upload'];
+const SCOPES = [
+    'https://www.googleapis.com/auth/youtube.upload',
+    'https://www.googleapis.com/auth/youtube.readonly'
+];
 const REDIRECT_URI = 'http://localhost:8080/';
 
 export async function authorize(credentialsPath, tokenPath) {
@@ -27,11 +30,22 @@ export async function authorize(credentialsPath, tokenPath) {
 
     try {
         const token = await fs.readFile(tokenPath, 'utf8');
-        oAuth2Client.setCredentials(JSON.parse(token));
+        const parsedToken = JSON.parse(token);
+
+        // Check if existing token has all required scopes
+        const tokenScopes = (parsedToken.scope || '').split(' ');
+        const hasAllScopes = SCOPES.every(scope => tokenScopes.includes(scope));
+
+        if (!hasAllScopes) {
+            console.log('Existing token is missing required scopes. Starting new authorization flow...');
+            return await getNewToken(oAuth2Client, tokenPath);
+        }
+
+        oAuth2Client.setCredentials(parsedToken);
         console.log('Successfully loaded existing token.');
         return oAuth2Client;
     } catch (err) {
-        console.log('No existing token found. Starting new authorization flow...');
+        console.log('No existing/valid token found. Starting new authorization flow...');
         return await getNewToken(oAuth2Client, tokenPath);
     }
 }
@@ -72,6 +86,40 @@ function getNewToken(oAuth2Client, tokenPath) {
             console.log('Server listening on http://localhost:8080');
         });
     });
+}
+
+export async function getUploadedVideoTitles(auth) {
+    const youtube = google.youtube({ version: 'v3', auth });
+    const titles = new Set();
+
+    try {
+        let nextPageToken = undefined;
+        do {
+            const response = await youtube.search.list({
+                part: 'snippet',
+                forMine: true,
+                type: 'video',
+                maxResults: 50,
+                pageToken: nextPageToken
+            });
+
+            const videos = response.data.items;
+            if (videos) {
+                for (const video of videos) {
+                    titles.add(video.snippet.title);
+                }
+            }
+            nextPageToken = response.data.nextPageToken;
+        } while (nextPageToken);
+
+        return titles;
+    } catch (err) {
+        console.error('Error fetching uploaded videos:', err.message);
+        if (err.response && err.response.data) {
+            console.error('   API Error:', JSON.stringify(err.response.data.error, null, 2));
+        }
+        return titles;
+    }
 }
 
 export async function uploadVideo(auth, videoFilePath, videoMetadata) {
