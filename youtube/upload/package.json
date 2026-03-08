@@ -1,0 +1,19 @@
+{
+  "name": "youtube-uploader-js",
+  "version": "1.0.0",
+  "description": "A Node.js script to upload videos to YouTube.",
+  "main": "upload-next.js",
+  "type": "module",
+  "scripts": {
+    "start": "node upload-next.js"
+  },
+  "keywords": [
+    "youtube",
+    "upload",
+    "api"
+  ],
+  "dependencies": {
+    "googleapis": "^134.0.0",
+    "open": "^9.1.0"
+  }
+}

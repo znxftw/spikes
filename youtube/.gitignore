@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Secrets and Credentials
+credentials.json
+youtube_token.json
+.env
+
+# Media / Processing Files
+*.mp4
+temp_clip_process.mp4
+temp_short_process.mp4
+
+# OS generated files
+.DS_Store
+Thumbs.db
