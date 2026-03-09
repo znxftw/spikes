@@ -88,9 +88,9 @@ function getNewToken(oAuth2Client, tokenPath) {
     });
 }
 
-export async function getUploadedVideoTitles(auth) {
+export async function getUploadedVideos(auth) {
     const youtube = google.youtube({ version: 'v3', auth });
-    const titles = new Set();
+    const videosMap = new Map();
 
     try {
         let nextPageToken = undefined;
@@ -106,19 +106,21 @@ export async function getUploadedVideoTitles(auth) {
             const videos = response.data.items;
             if (videos) {
                 for (const video of videos) {
-                    titles.add(video.snippet.title);
+                    if (video.id && video.id.videoId) {
+                        videosMap.set(video.snippet.title, video.id.videoId);
+                    }
                 }
             }
             nextPageToken = response.data.nextPageToken;
         } while (nextPageToken);
 
-        return titles;
+        return videosMap;
     } catch (err) {
         console.error('Error fetching uploaded videos:', err.message);
         if (err.response && err.response.data) {
             console.error('   API Error:', JSON.stringify(err.response.data.error, null, 2));
         }
-        return titles;
+        return videosMap;
     }
 }
 
@@ -149,6 +151,7 @@ export async function uploadVideo(auth, videoFilePath, videoMetadata) {
 
         console.log(`✅ Successfully uploaded! Video ID: ${response.data.id}`);
         console.log(`   Watch it here: https://www.youtube.com/watch?v=${response.data.id}`);
+        return response.data.id;
 
     } catch (err) {
         console.error(`❌ Failed to upload ${fileName}.`);
@@ -157,5 +160,6 @@ export async function uploadVideo(auth, videoFilePath, videoMetadata) {
         } else {
             console.error('   Error:', err.message);
         }
+        return null;
     }
 }
