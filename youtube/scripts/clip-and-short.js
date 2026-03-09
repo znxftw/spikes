@@ -63,7 +63,27 @@ async function main() {
         const result = spawnSync('ffmpeg', args, { stdio: 'inherit' });
 
         if (result.status === 0 && fs.existsSync(tempShort)) {
-            moveToDestination(tempShort, shortDir, "shorts");
+            const finalShortName = moveToDestination(tempShort, shortDir, "shorts");
+            if (finalShortName && config.youtube && config.youtube.metadataPath) {
+                try {
+                    const metadataPath = config.youtube.metadataPath;
+                    let metadata = {};
+                    if (fs.existsSync(metadataPath)) {
+                        metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+                    }
+                    if (!metadata[finalShortName]) {
+                        metadata[finalShortName] = { 
+                            title: `Title for ${finalShortName}`, 
+                            description: `Description for ${finalShortName}`, 
+                            youtubeId: "" 
+                        };
+                        fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2), 'utf8');
+                        console.log(`\x1b[32mAdded entry for ${finalShortName} to metadata.json\x1b[0m`);
+                    }
+                } catch (err) {
+                    console.error(`\x1b[31mFailed to update metadata.json: ${err.message}\x1b[0m`);
+                }
+            }
             processed = true;
         } else {
             console.error("\x1b[31mFFmpeg failed to create short.\x1b[0m");

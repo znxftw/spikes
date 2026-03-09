@@ -41,6 +41,7 @@ export function moveToDestination(pathToMove, destinationDir, prefix, preserveNa
             }
         }
         console.log(`\x1b[32mSuccess: Saved to ${destinationPath}\x1b[0m`);
+        return finalName;
     } else {
         console.error(`\x1b[31mFile not found for moving: ${pathToMove}\x1b[0m`);
     }
