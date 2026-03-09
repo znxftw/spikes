@@ -60,7 +60,7 @@ async function main() {
                 videoMetadata.youtubeId = videoId;
                 metadataChanged = true;
             }
-            break; // Currently uploads one video and exits, remove break to loop over all of them
+            break;
         } catch {
             console.log(`File ${fileName} listed in metadata but not found on disk. Skipping.`);
         }

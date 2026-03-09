@@ -6,7 +6,6 @@ const __dirname = path.dirname(__filename);
 
 export const config = {
     video: {
-        // Edit these variables
         inputFile: "C:\\Path\\To\\Video.mp4",
         start: "00:02:30",
         end: "00:02:57",

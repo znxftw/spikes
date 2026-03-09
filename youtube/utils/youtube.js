@@ -32,7 +32,6 @@ export async function authorize(credentialsPath, tokenPath) {
         const token = await fs.readFile(tokenPath, 'utf8');
         const parsedToken = JSON.parse(token);
 
-        // Check if existing token has all required scopes
         const tokenScopes = (parsedToken.scope || '').split(' ');
         const hasAllScopes = SCOPES.every(scope => tokenScopes.includes(scope));
 
@@ -137,7 +136,7 @@ export async function uploadVideo(auth, videoFilePath, videoMetadata) {
                 snippet: {
                     title: videoMetadata.title,
                     description: videoMetadata.description,
-                    categoryId: '20', // Gaming
+                    categoryId: '20',
                 },
                 status: {
                     privacyStatus: 'public',
