@@ -141,7 +141,7 @@ export async function uploadVideo(auth, videoFilePath, videoMetadata) {
                 },
                 status: {
                     privacyStatus: 'public',
-                    madeForKids: false,
+                    selfDeclaredMadeForKids: false,
                 },
             },
             media: {
